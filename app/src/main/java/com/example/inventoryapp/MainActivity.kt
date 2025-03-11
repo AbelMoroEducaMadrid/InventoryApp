@@ -6,8 +6,9 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.Toolbar
-import com.example.inventoryapp.fragments.AddItemFragment
-import com.example.inventoryapp.fragments.ListItemsFragment
+import com.example.inventoryapp.fragments.MoviesFragment
+import com.example.inventoryapp.fragments.DirectorsFragment
+import com.example.inventoryapp.fragments.ActorsFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -22,23 +23,27 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
 
-        // Cargar fragmento inicial
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ListItemsFragment())
+                .replace(R.id.fragment_container, MoviesFragment())
                 .commit()
         }
 
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_list -> {
+                R.id.nav_movies -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ListItemsFragment())
+                        .replace(R.id.fragment_container, MoviesFragment())
                         .commit()
                 }
-                R.id.nav_add -> {
+                R.id.nav_directors -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, AddItemFragment())
+                        .replace(R.id.fragment_container, DirectorsFragment())
+                        .commit()
+                }
+                R.id.nav_actors -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, ActorsFragment())
                         .commit()
                 }
             }

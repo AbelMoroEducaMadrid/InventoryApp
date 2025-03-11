@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -10,19 +10,19 @@
         android:id="@+id/edit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nombre del item" />
+        android:hint="Nombre" />
 
     <EditText
-        android:id="@+id/edit_quantity"
+        android:id="@+id/edit_nationality"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Cantidad"
-        android:inputType="number" />
+        android:hint="Nacionalidad" />
 
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/edit_birth_year"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Añadir" />
+        android:hint="Año de nacimiento"
+        android:inputType="number" />
 
 </LinearLayout>
