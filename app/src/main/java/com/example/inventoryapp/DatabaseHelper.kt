@@ -2,6 +2,7 @@ package com.example.inventoryapp
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
@@ -9,7 +10,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "MoviesDB"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 1
 
         // Tabla Movies
         private const val TABLE_MOVIES = "movies"
@@ -39,7 +40,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Crear tabla Movies
         db.execSQL("CREATE TABLE $TABLE_MOVIES (" +
                 "$MOVIE_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "$MOVIE_TITLE TEXT," +
@@ -47,21 +47,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "$MOVIE_DIRECTOR_ID INTEGER," +
                 "FOREIGN KEY($MOVIE_DIRECTOR_ID) REFERENCES $TABLE_DIRECTORS($DIRECTOR_ID))")
 
-        // Crear tabla Directors
         db.execSQL("CREATE TABLE $TABLE_DIRECTORS (" +
                 "$DIRECTOR_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "$DIRECTOR_NAME TEXT," +
                 "$DIRECTOR_NATIONALITY TEXT," +
                 "$DIRECTOR_BIRTH_YEAR INTEGER)")
 
-        // Crear tabla Actors
         db.execSQL("CREATE TABLE $TABLE_ACTORS (" +
                 "$ACTOR_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "$ACTOR_NAME TEXT," +
                 "$ACTOR_NATIONALITY TEXT," +
                 "$ACTOR_BIRTH_YEAR INTEGER)")
 
-        // Crear tabla Movies_Actors (relación M-N)
         db.execSQL("CREATE TABLE $TABLE_MOVIES_ACTORS (" +
                 "$MA_MOVIE_ID INTEGER," +
                 "$MA_ACTOR_ID INTEGER," +
@@ -69,12 +66,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FOREIGN KEY($MA_ACTOR_ID) REFERENCES $TABLE_ACTORS($ACTOR_ID)," +
                 "PRIMARY KEY($MA_MOVIE_ID, $MA_ACTOR_ID))")
 
-        // Inicializar datos
         initializeData(db)
     }
 
     private fun initializeData(db: SQLiteDatabase) {
-        // Insertar Directores
         val directors = listOf(
             Triple("Jonathan Demme", "EE.UU.", 1944),
             Triple("Martin Campbell", "Nueva Zelanda", 1943),
@@ -90,7 +85,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             directorIds.add(db.insert(TABLE_DIRECTORS, null, values))
         }
 
-        // Insertar Actores
         val actors = listOf(
             Triple("Jodie Foster", "EE.UU.", 1962),
             Triple("Anthony Hopkins", "Reino Unido", 1937),
@@ -109,11 +103,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             actorIds.add(db.insert(TABLE_ACTORS, null, values))
         }
 
-        // Insertar Películas
         val movies = listOf(
-            Triple("El silencio de los corderos", 1991, directorIds[0]), // Jonathan Demme
-            Triple("La leyenda del Zorro", 2005, directorIds[1]),        // Martin Campbell
-            Triple("Django", 2012, directorIds[2])                      // Quentin Tarantino
+            Triple("El silencio de los corderos", 1991, directorIds[0]),
+            Triple("La leyenda del Zorro", 2005, directorIds[1]),
+            Triple("Django", 2012, directorIds[2])
         )
         val movieIds = mutableListOf<Long>()
         movies.forEach { (title, year, directorId) ->
@@ -125,11 +118,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             movieIds.add(db.insert(TABLE_MOVIES, null, values))
         }
 
-        // Relacionar Películas con Actores
         val movieActors = listOf(
-            Pair(movieIds[0], listOf(actorIds[0], actorIds[1])), // El silencio: Jodie Foster, Anthony Hopkins
-            Pair(movieIds[1], listOf(actorIds[2], actorIds[3])), // Zorro: Antonio Banderas, Catherine Zeta-Jones
-            Pair(movieIds[2], listOf(actorIds[4], actorIds[5]))  // Django: Jamie Foxx, Leonardo DiCaprio
+            Pair(movieIds[0], listOf(actorIds[0], actorIds[1])),
+            Pair(movieIds[1], listOf(actorIds[2], actorIds[3])),
+            Pair(movieIds[2], listOf(actorIds[4], actorIds[5]))
         )
         movieActors.forEach { (movieId, actors) ->
             actors.forEach { actorId ->
@@ -163,6 +155,32 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return id
     }
 
+    fun updateMovie(id: Int, title: String, year: Int, directorId: Int): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(MOVIE_TITLE, title)
+            put(MOVIE_YEAR, year)
+            put(MOVIE_DIRECTOR_ID, directorId)
+        }
+        val rowsAffected = db.update(TABLE_MOVIES, values, "$MOVIE_ID = ?", arrayOf(id.toString()))
+        db.close()
+        return rowsAffected > 0
+    }
+
+    fun deleteMovie(id: Int): Boolean {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_MOVIES_ACTORS, "$MA_MOVIE_ID = ?", arrayOf(id.toString()))
+            val rowsAffected = db.delete(TABLE_MOVIES, "$MOVIE_ID = ?", arrayOf(id.toString()))
+            db.setTransactionSuccessful()
+            return rowsAffected > 0
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
     fun getAllMovies(): List<Movie> {
         val movies = mutableListOf<Movie>()
         val db = readableDatabase
@@ -180,7 +198,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     Director(
                         cursor.getInt(cursor.getColumnIndexOrThrow(DIRECTOR_ID)),
                         cursor.getString(cursor.getColumnIndexOrThrow(DIRECTOR_NAME)),
-                        "", 0 // Nacionalidad y año no necesarios aquí
+                        "", 0
                     )
                 )
                 movies.add(movie)
@@ -225,6 +243,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
     }
 
+    fun clearMovieActors(movieId: Int) {
+        val db = writableDatabase
+        db.delete(TABLE_MOVIES_ACTORS, "$MA_MOVIE_ID = ?", arrayOf(movieId.toString()))
+        db.close()
+    }
+
     // Métodos para Directors
     fun addDirector(name: String, nationality: String, birthYear: Int): Long {
         val db = writableDatabase
@@ -236,6 +260,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val id = db.insert(TABLE_DIRECTORS, null, values)
         db.close()
         return id
+    }
+
+    fun updateDirector(id: Int, name: String, nationality: String, birthYear: Int): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(DIRECTOR_NAME, name)
+            put(DIRECTOR_NATIONALITY, nationality)
+            put(DIRECTOR_BIRTH_YEAR, birthYear)
+        }
+        val rowsAffected = db.update(TABLE_DIRECTORS, values, "$DIRECTOR_ID = ?", arrayOf(id.toString()))
+        db.close()
+        return rowsAffected > 0
+    }
+
+    fun deleteDirector(id: Int): Boolean {
+        val db = writableDatabase
+        try {
+            val rowsAffected = db.delete(TABLE_DIRECTORS, "$DIRECTOR_ID = ?", arrayOf(id.toString()))
+            if (rowsAffected == 0) return false
+            return true
+        } catch (e: SQLiteConstraintException) {
+            throw SQLiteConstraintException("El director tiene películas asociadas")
+        } finally {
+            db.close()
+        }
     }
 
     fun getAllDirectors(): List<Director> {
@@ -271,6 +320,32 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val id = db.insert(TABLE_ACTORS, null, values)
         db.close()
         return id
+    }
+
+    fun updateActor(id: Int, name: String, nationality: String, birthYear: Int): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(ACTOR_NAME, name)
+            put(ACTOR_NATIONALITY, nationality)
+            put(ACTOR_BIRTH_YEAR, birthYear)
+        }
+        val rowsAffected = db.update(TABLE_ACTORS, values, "$ACTOR_ID = ?", arrayOf(id.toString()))
+        db.close()
+        return rowsAffected > 0
+    }
+
+    fun deleteActor(id: Int): Boolean {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_MOVIES_ACTORS, "$MA_ACTOR_ID = ?", arrayOf(id.toString()))
+            val rowsAffected = db.delete(TABLE_ACTORS, "$ACTOR_ID = ?", arrayOf(id.toString()))
+            db.setTransactionSuccessful()
+            return rowsAffected > 0
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
     }
 
     fun getAllActors(): List<Actor> {

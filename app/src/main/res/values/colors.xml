@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primario_claro">#FFBB86FC</color>
+    <color name="primario">#FF6200EE</color>
+    <color name="primario_oscuro">#FF3700B3</color>
+    <color name="secundario_claro">#FF03DAC5</color>
+    <color name="secundario_oscuro">#FF018786</color>
+    <color name="fondo">#FFFFFFFF</color>
+    <color name="primer_plano">#FF000000</color>
+    <color name="error">#FFB00020</color>
+    <color name="exito">#4CAF50</color>
+    <color name="advertencia">#FF9800</color>
+    <color name="informacion">#2196F3</color>
+    <color name="gris_claro">#E0E0E0</color>
+    <color name="gris">#9E9E9E</color>
+    <color name="gris_oscuro">#616161</color>
+    <color name="negro">#000000</color>
+    <color name="blanco">#FFFFFF</color>
+    <color name="rojo">#F44336</color>
+    <color name="verde">#4CAF50</color>
+    <color name="azul">#2196F3</color>
+    <color name="amarillo">#FFEB3B</color>
+    <color name="naranja">#FF9800</color>
+    <color name="morado">#9C27B0</color>
+    <color name="rosa">#E91E63</color>
+    <color name="turquesa">#009688</color>
+    <color name="marron">#795548</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="cian">#00BCD4</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +35,32 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="background">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_background_selected">#E0E0E0</color>
+    <color name="primary">#1976D2</color>
+
+    <color name="background_component">#E3F2FD</color> <!-- Azul claro para componentes -->
+    <color name="background_component_selected">#1976D2</color> <!-- Azul oscuro para componentes seleccionados -->
+    <color name="background_app">#FFFFFF</color> <!-- Fondo blanco para la aplicación -->
+    <color name="background_button">#2196F3</color> <!-- Azul intenso para botones -->
+    <color name="title_text">#212121</color> <!-- Gris oscuro para texto principal -->
+    <color name="background_fab">#1976D2</color> <!-- Azul oscuro para FAB -->
+    <color name="peso_bajo">#FFC107</color> <!-- Amarillo para peso bajo -->
+    <color name="peso_normal">#4CAF50</color> <!-- Verde para peso normal (se mantiene) -->
+    <color name="peso_sobrepeso">#FF9800</color> <!-- Naranja para sobrepeso -->
+    <color name="obesidad">#F44336</color> <!-- Rojo para obesidad (se mantiene) -->
+
+    <color name="lista_background_card">#FF081A4A</color>
+    <color name="lista_background_disabled">#787878</color>
+    <color name="lista_background_lista_app">#FF2D4993</color>
+    <color name="lista_subtitle_text">#959595</color>
+    <color name="lista_accent">#E91E63</color>
+    <color name="lista_trabajo_category">#FF9800</color>
+    <color name="lista_personal_category">#00BCD4</color>
+    <color name="lista_otros_category">#4CAF50</color>
+    <color name="lista_estudio_category">#673AB7</color>
+    <color name="lista_hogar_category">#795548</color>
+    <color name="lista_salud_category">#8BC34A</color>
 </resources>
