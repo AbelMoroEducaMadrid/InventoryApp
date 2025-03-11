@@ -17,6 +17,9 @@
         android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@android:drawable/ic_input_add" />
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/lista_accent"
+        app:fabSize="normal"
+        app:tint="@color/blanco"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
